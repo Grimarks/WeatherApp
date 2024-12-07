@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+<!--Card-->
+<div class="w-[90%] max-w-[470px] bg-gradient-to-r from-blue-500 to-purple-600 mt-[100px] mx-auto rounded-[20px] py-[40px] px-[35px] text-center text-white shadow-lg">
+    <!-- Search -->
+    <div class="mb-8 flex justify-center items-center space-x-2">
+        <input id="city-input" type="text" placeholder="Enter City Name" spellcheck="false"
+               class="w-full py-3 px-4 rounded-lg text-gray-700 focus:outline-none focus:ring focus:ring-purple-300">
+        <button id="search-btn" class="p-3 bg-white rounded-lg hover:bg-gray-200 transition">
+            <img src="foto/cari.png" alt="Search" class="w-6 h-6">
+        </button>
+    </div>
+
+    <!-- Weather -->
+    <div id="weather-info" class="mb-8 hidden">
+        <img id="weather-icon" src="foto/rain.png" alt="Weather Icon" class="mx-auto w-20 h-20">
+        <h1 id="temperature" class="text-5xl font-bold my-3">22°C</h1>
+        <h2 id="city-name" class="text-xl font-semibold">City Name</h2>
+    </div>
+
+    <!-- Weather details -->
+    <div id="details" class="flex justify-between mt-6 hidden">
+        <!-- Humidity -->
+        <div class="flex items-center space-x-2">
+            <img src="foto/humidity.png" alt="Humidity" class="w-8 h-8">
+            <div>
+                <p id="humidity" class="text-lg font-semibold">50%</p>
+                <p class="text-sm text-gray-200">Humidity</p>
+            </div>
+        </div>
+
+        <!-- Wind Speed -->
+        <div class="flex items-center space-x-2">
+            <img src="foto/wind.png" alt="Wind" class="w-8 h-8">
+            <div>
+                <p id="wind-speed" class="text-lg font-semibold">15 Km/h</p>
+                <p class="text-sm text-gray-200">Wind Speed</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const searchBtn = document.getElementById("search-btn");
+    const weatherIcon = document.getElementById("weather-icon");
+
+    searchBtn.addEventListener("click", async () => {
+        const city = document.getElementById("city-input").value.trim();
+        if (!city) {
+            alert("Please enter a city name.");
+            return;
+        }
+
+        const apiKey = "07ceb21872ee0771ca76743b922f73de";
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error("City not found.");
+            }
+
+            const data = await response.json();
+
+            document.getElementById("weather-info").classList.remove("hidden");
+            document.getElementById("details").classList.remove("hidden");
+            document.getElementById("city-name").textContent = data.name;
+            document.getElementById("temperature").textContent = `${Math.round(data.main.temp)}°C`;
+            document.getElementById("humidity").textContent = `${data.main.humidity}%`;
+            document.getElementById("wind-speed").textContent = `${data.wind.speed} Km/h`;
+
+            const weatherCondition = data.weather[0].main.toLowerCase();
+            console.log("Weather Condition:", weatherCondition);
+
+            const iconMap = {
+                clouds: "foto/clouds.png",
+                clear: "foto/clear.png",
+                rain: "foto/rain.png",
+                drizzle: "foto/drizzle.png",
+                mist: "foto/mist.png",
+            };
+            weatherIcon.src = iconMap[weatherCondition] || "foto/default.png";
+
+            console.log("Icon Path:", weatherIcon.src);
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+</script>
+
+</body>
+</html>
